@@ -1,0 +1,9 @@
+bin/
+*.o
+*.out
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
