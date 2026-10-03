@@ -131,6 +131,6 @@ y6 = add_step(page6, y6,
               observation="The kernel allocates isolated virtual memory pages for the process. Instructions reside in the read-only Code segment (.text), global variables in Data/BSS, dynamic allocations on the Heap, and call frames on the Stack.",
               max_img_h=220)
 
-doc.save(pdf_path)
+doc.save(pdf_path, garbage=4, deflate=True)
 print(f"Successfully generated exact PDF guide: {pdf_path}")
 print(f"Total pages: {len(doc)}")
