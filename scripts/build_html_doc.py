@@ -19,7 +19,7 @@ html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Process Lifecycles & OS Interaction: Step-by-Step Guide</title>
+<title>Lab 2: Linux Process Lifecycles &amp; OS Interaction: Step-by-Step Guide</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
   body {{
@@ -41,6 +41,7 @@ html_content = f"""<!DOCTYPE html>
   th {{ background: #f6f8fa; font-weight: 600; }}
   img {{ max-width: 100%; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin: 15px 0; border: 1px solid #30363d; background: #0c0c0c; }}
   .badge {{ display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; background: #ddf4ff; color: #0969da; margin-right: 8px; }}
+  .summary-box {{ background: #f6f8fa; border: 1px solid #d0d7de; border-left: 5px solid #0969da; padding: 16px 20px; border-radius: 6px; margin: 25px 0; }}
   .checklist {{ list-style-type: none; padding-left: 0; }}
   .checklist li::before {{ content: '✔ '; color: #1a7f37; font-weight: bold; }}
   .qa-block {{ background: #f6f8fa; border-left: 4px solid #0969da; padding: 12px 18px; margin-bottom: 16px; border-radius: 0 6px 6px 0; }}
@@ -54,8 +55,8 @@ html_content = f"""<!DOCTYPE html>
 </head>
 <body>
 
-<h1>Process Lifecycles & OS Interaction: Step-by-Step Guide</h1>
-<p><strong>Course:</strong> ST5039CMD Programming and Operating System &bull; <strong>Topic:</strong> Process Layout, Virtual Memory & OS Loading (Lecture 2 & Lab 3)</p>
+<h1>Lab 2: Linux Process Lifecycles &amp; OS Interaction: Step-by-Step Guide</h1>
+<p><strong>Course:</strong> ST5039CMD Programming and Operating System &bull; <strong>Topic:</strong> Process Layout, Virtual Memory &amp; OS Loading (Lecture 2 &amp; Lab 2)</p>
 <div>
   <span class="badge">Linux Kernel</span>
   <span class="badge">POSIX System Calls</span>
@@ -63,11 +64,69 @@ html_content = f"""<!DOCTYPE html>
   <span class="badge">Exit Status ($?)</span>
 </div>
 
+<div class="summary-box">
+  <h2 style="margin-top: 0; border-bottom: none; padding-bottom: 0; color: #0969da;">📌 Executive Summary &amp; Lab Summarization (LAB 2)</h2>
+  <p>The primary objective of <strong>Lab 2</strong> is to investigate the transition of passive disk executables into active in-memory processes managed by the Linux kernel. A process is an executing program instance with dedicated virtual memory segments, unique Process IDs (PIDs), file descriptors (0, 1, 2), and exit status feedback.</p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Task #</th>
+        <th>Task Title</th>
+        <th>Core Concept</th>
+        <th>Key Commands</th>
+        <th>State / Output</th>
+        <th>Kernel Mechanism</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Task 1</strong></td>
+        <td>Long-Running Process</td>
+        <td>Backgrounding (<code>&amp;</code>)</td>
+        <td><code>./task1 &amp;</code><br><code>ps aux | grep task1</code></td>
+        <td>State <code>S</code> (Sleep)<br>Job ID <code>[1]</code> (PID 24810)</td>
+        <td>Frees shell immediately; <code>sleep(1)</code> yields CPU cycles to the scheduler.</td>
+      </tr>
+      <tr>
+        <td><strong>Task 2</strong></td>
+        <td>Process Identity</td>
+        <td>PID &amp; Parent PPID</td>
+        <td><code>./task2 &amp;</code><br><code>ps -p 25102 -o pid,ppid,cmd</code></td>
+        <td>PID: <code>25102</code><br>PPID: <code>19440</code></td>
+        <td>Kernel tracks task hierarchy; PPID traces back to calling bash shell.</td>
+      </tr>
+      <tr>
+        <td><strong>Task 3</strong></td>
+        <td>Exit Status Codes</td>
+        <td>Shell Feedback (<code>$?</code>)</td>
+        <td><code>./task3</code><br><code>echo $?</code></td>
+        <td>Input 5 &rarr; <code>$? = 0</code><br>Input -5 &rarr; <code>$? = 1</code></td>
+        <td>Program signals success (0) or error (non-zero) back to host shell via return code.</td>
+      </tr>
+      <tr>
+        <td><strong>Task 4</strong></td>
+        <td>Standard I/O Streams</td>
+        <td>File Descriptors (0 &amp; 1)</td>
+        <td><code>./task4</code></td>
+        <td>Input: "Bablu"<br>Output formatted</td>
+        <td>Kernel maps <code>stdin</code> (fd 0) to keyboard and <code>stdout</code> (fd 1) to display.</td>
+      </tr>
+      <tr>
+        <td><strong>Task 5</strong></td>
+        <td>Conditional Lifecycle</td>
+        <td>Branching &amp; Cleanup</td>
+        <td><code>./task5</code><br><code>echo $?</code></td>
+        <td>Choice 1 &rarr; exit 0<br>Choice 0 &rarr; exit 1</td>
+        <td>Demonstrates process memory allocation, execution, and PCB reclamation (26780 vs 26795).</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <hr style="border: none; border-top: 1px solid #d0d7de; margin: 25px 0;">
 
-<p>The execution of a program in an operating system involves understanding process creation, memory segment allocation, execution state transitions, and kernel termination feedback. This document provides a practical, step-by-step demonstration of each phase, mapping directly to <strong>Lecture 2 (A Process Layout & OS Loading)</strong> and <strong>Lab 3 (Investigating Process Lifecycles)</strong>.</p>
-
-<h2>II. Architecture Overview: A Process Layout & OS Loading</h2>
+<h2>II. Architecture Overview: A Process Layout &amp; OS Loading</h2>
 
 <h3>1. Program vs. Process</h3>
 <ul>
@@ -101,7 +160,7 @@ html_content = f"""<!DOCTYPE html>
 
 <h3>Task 2: Process Identity (PID and PPID)</h3>
 <ul>
-  <li><strong>Objective:</strong> Every process in Linux has a unique Process ID (<code>PID</code>). The process that created it is the Parent Process ID (<code>PPID</code>), usually your terminal shell. Query these using <code>getpid()</code> and <code>getppid()</code>, and verify them via <code>ps -p &lt;PID&gt; -o pid,ppid,cmd</code>.</li>
+  <li><strong>Objective:</strong> Every process in Linux has a unique Process ID (<code>PID</code>). The process that created it is the Parent Process ID (<code>PPID</code>), usually your terminal shell. Query these using <code>getpid()</code> and <code>getppid()</code>, and verify them via <code>ps -p 25102 -o pid,ppid,cmd</code>.</li>
   <li><strong>Command:</strong> <code>cat task2_identity.c then gcc task2_identity.c -o task2 then ./task2 &amp; then ps -p 25102 -o pid,ppid,cmd</code></li>
   <li><strong>Image Placeholder:</strong></li>
 </ul>
@@ -135,7 +194,7 @@ html_content = f"""<!DOCTYPE html>
 <img src="{img5}" alt="Task 5 - Conditional Execution and Termination">
 <p><strong>Observation:</strong> Choosing <code>1</code> causes the process to continue, simulate workload (<code>sleep(5)</code>), and return exit code <code>0</code> (<code>Success</code>). Choosing <code>0</code> causes the process to immediately abort and return exit code <code>1</code> (<code>Failure</code>). Each independent run receives a newly allocated PID from the kernel (<code>26780</code> vs <code>26795</code>), illustrating process creation and destruction.</p>
 
-<h2>IV. Lecture 2 Knowledge Test Q&A Reference</h2>
+<h2>IV. Lecture 2 Knowledge Test Q&amp;A Reference</h2>
 <div class="qa-block"><div class="qa-q">1. What is the difference between source code and an executable?</div><div class="qa-a">Source code is human-readable high-level code (.c). An executable is a machine-readable binary file (.out/ELF) created by a compiler and linker containing CPU instructions and data sections.</div></div>
 <div class="qa-block"><div class="qa-q">2. What command compiles a C program?</div><div class="qa-a"><code>gcc program.c -o program</code></div></div>
 <div class="qa-block"><div class="qa-q">3. What is a process?</div><div class="qa-a">A process is an active program in execution loaded into main memory (RAM) and managed by the operating system kernel.</div></div>
@@ -156,7 +215,7 @@ html_content = f"""<!DOCTYPE html>
 </html>
 """
 
-output_path = os.path.join(base_dir, "Lab3_Process_Lifecycles_Documentation.html")
+output_path = os.path.join(base_dir, "Lab_2_Process_Lifecycles_Documentation.html")
 with open(output_path, "w", encoding="utf-8") as f:
     f.write(html_content)
 

@@ -1,11 +1,43 @@
-# Lab 3: Investigating Process Lifecycles and OS Interaction
+# Lab 2: Investigating Process Lifecycles and OS Interaction
 ## Comprehensive Step-by-Step Technical Documentation
+
+**Course:** ST5039CMD Programming and Operating System  
+**Topic:** Process Layout, Virtual Memory & OS Loading (Lecture 2 & Lab 2)  
+**Author:** Bablu Ray  
+**Documentation Artifacts:** [PDF Guide](Process_Lifecycles_Step_by_Step_Guide.pdf) | [HTML Report](Lab_2_Process_Lifecycles_Documentation.html)
+
+---
+
+## 📌 Executive Summary & Lab Summarization (LAB 2)
+
+### 1. Lab Purpose & Overview
+The execution of software within a modern operating system relies fundamentally on process isolation, lifecycle management, virtual address space partitioning, and inter-process communication. In **Lab 2**, we explore how the Linux kernel transitions a dormant binary executable on disk into an active execution entity (a **process**) in RAM. We interact with kernel system calls (`getpid()`, `getppid()`), manage background jobs (`&`), observe execution states (`ps aux`), transmit standard I/O streams (`stdin`, `stdout`), and capture kernel termination exit status codes (`$?`).
+
+### 2. Comprehensive Task Matrix
+
+| Task # | Task Name | Key Concept | Core Commands | Input / Action | Output State / Result | Kernel Internal Mechanism |
+|---|---|---|---|---|---|---|
+| **Task 1** | **Long-Running Process** | Background Execution | `gcc task1_alive.c -o task1`<br>`./task1 &`<br>`ps aux \| grep task1` | `&` background operator | Job `[1] 24810`; State `S` | Asynchronous execution; `sleep(1)` suspends CPU usage (Interruptible Sleep). |
+| **Task 2** | **Process Identity** | Process & Parent IDs | `gcc task2_identity.c -o task2`<br>`./task2 &`<br>`ps -p 25102 -o pid,ppid,cmd` | `getpid()`, `getppid()` system calls | `PID: 25102`<br>`PPID: 19440` | Kernel assigns distinct PID from process table; parent PPID traces to interactive shell. |
+| **Task 3** | **Exit Status Codes** | Shell Feedback via `$?` | `gcc task3_exit.c -o task3`<br>`./task3`<br>`echo $?` | Positive input `5`<br>Negative input `-5` | `echo $? -> 0` (Success)<br>`echo $? -> 1` (Failure) | Program communicates status code back to calling shell environment. |
+| **Task 4** | **Standard I/O Streams** | File Descriptors (0 & 1) | `gcc task4_input.c -o task4`<br>`./task4` | Keyboard input (`Bablu`) | "Hello, Bablu! Welcome to OS Class." | Kernel connects file descriptors 0 (`stdin`) and 1 (`stdout`) to terminal. |
+| **Task 5** | **Conditional Execution** | Dynamic Branching & Cleanup | `gcc task5_control.c -o task5`<br>`./task5`<br>`echo $?` | Input `1` (Continue)<br>Input `0` (Abort) | Choice 1: returns 0<br>Choice 0: returns 1 | Distinct PIDs (`26780` vs `26795`) demonstrate allocation and process destruction. |
+
+### 3. Process Memory Segments Summary
+
+| Segment | Growth Direction | Permissions | Contents Stored | Management & Lifecycle |
+|---|---|---|---|---|
+| **Stack** | Downwards (High -> Low) | Read/Write (`RW-`) | Local variables, function stack frames, parameters, return addresses. | Managed automatically by CPU (LIFO; deallocated when function returns). |
+| **Heap** | Upwards (Low -> High) | Read/Write (`RW-`) | Dynamic runtime memory allocations (`malloc()`, `calloc()`). | Managed manually by programmer; persists until freed via `free()`. |
+| **BSS (`.bss`)** | Fixed Size | Read/Write (`RW-`) | Uninitialized global and static variables. | Zero-initialized by kernel loader at startup without taking space in binary file. |
+| **Data (`.data`)** | Fixed Size | Read/Write (`RW-`) | Initialized global and static variables. | Copied directly from the ELF executable binary on disk into RAM. |
+| **Text / Code** | Fixed Size | Read/Execute (`R-X`) | Compiled CPU machine instructions (binary opcodes). | Read-only to prevent self-modifying code vulnerabilities; shared across instances. |
 
 ---
 
 ## I. Executive Introduction
 
-In **Lecture 3 & Lecture 2**, we learned that an Operating System manages processes and system resources. In this laboratory, we bring that theory to life. Instead of just writing code that prints text, we author C programs that interact directly with the Linux kernel to query process identity, control execution lifecycles, and communicate success or failure back to the host shell.
+In **Lecture 2 & Lab 2**, we learned that an Operating System manages processes and system resources. In this laboratory, we bring that theory to life. Instead of just writing code that prints text, we author C programs that interact directly with the Linux kernel to query process identity, control execution lifecycles, and communicate success or failure back to the host shell.
 
 ---
 
